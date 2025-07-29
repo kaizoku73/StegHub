@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steghub - Advanced Steganography Tool</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <div class="header">
+            <h1 class="logo">Steghub</h1>
+            <p class="subtitle">Advanced Steganography Tool for Secure Data Hiding</p>
+            
+            <!-- Mode Toggle Switch -->
+            <div class="mode-toggle">
+                <span class="toggle-label">Image</span>
+                <label class="switch">
+                    <input type="checkbox" id="modeToggle">
+                    <span class="slider"></span>
+                </label>
+                <span class="toggle-label">Audio</span>
+            </div>
+        </div>
+
+        <!-- Image Section -->
+        <div id="imageSection" class="content-section active">
+            <div class="methods-container">
+                <!-- LSB Image Method -->
+                <div class="method-card">
+                    <h2 class="method-title">LSB Image Steganography</h2>
+                    <p class="method-description">Hide files inside images using Least Significant Bit method with AES encryption</p>
+                    
+                    <!-- Operation Toggle -->
+                    <div class="operation-toggle">
+                        <button class="toggle-btn active" data-method="lsb-image" data-operation="embed">Embed</button>
+                        <button class="toggle-btn" data-method="lsb-image" data-operation="extract">Extract</button>
+                    </div>
+
+                    <!-- Embed Form -->
+                    <form id="lsb-image-embed" class="operation-form active">
+                        <div class="file-input-group">
+                            <label for="lsb-image-embed-cover">Cover Image:</label>
+                            <input type="file" id="lsb-image-embed-cover" accept="image/*" required>
+                            <span class="file-info">Supported formats: PNG Only</span>
+                        </div>
+                        
+                        <div class="file-input-group">
+                            <label for="lsb-image-embed-secret">Secret File:</label>
+                            <input type="file" id="lsb-image-embed-secret" required>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="lsb-image-embed-password">Key:</label>
+                            <input type="text" id="lsb-image-embed-password" placeholder="Enter key for encryption" required>
+                            <span class="file-info">Remember this key for extraction</span>
+                        </div>
+                        
+                        <button type="submit" class="submit-btn">Embed File</button>
+                    </form>
+
+                    <!-- Extract Form -->
+                    <form id="lsb-image-extract" class="operation-form">
+                        <div class="file-input-group">
+                            <label for="lsb-image-extract-stego">Stego Image:</label>
+                            <input type="file" id="lsb-image-extract-stego" accept="image/*" required>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="lsb-image-extract-password">Key:</label>
+                            <input type="text" id="lsb-image-extract-password" placeholder="Enter the key used during embedding" required>
+                        </div>
+                        
+                        <button type="submit" class="submit-btn">Extract File</button>
+                    </form>
+                </div>
+
+                <!-- Histogram Image Method -->
+                <div class="method-card">
+                    <h2 class="method-title">Histogram Shifting</h2>
+                    <p class="method-description">Hide text messages (max 100 chars) using histogram shifting</p>
+                    
+                    <!-- Operation Toggle -->
+                    <div class="operation-toggle">
+                        <button class="toggle-btn active" data-method="histogram" data-operation="embed">Embed</button>
+                        <button class="toggle-btn" data-method="histogram" data-operation="extract">Extract</button>
+                    </div>
+
+                    <!-- Embed Form -->
+                    <form id="histogram-embed" class="operation-form active">
+                        <div class="file-input-group">
+                            <label for="histogram-embed-cover">Cover Image:</label>
+                            <input type="file" id="histogram-embed-cover" accept="image/*" required>
+                            <span class="file-info">Supported formats: PNG Only</span>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="histogram-embed-message">Secret Message:</label>
+                            <textarea id="histogram-embed-message" placeholder="Enter your secret message (max 100 characters)" maxlength="100" required></textarea>
+                            <span class="char-counter" id="histogram-embed-counter">0/100</span>
+                        </div>
+                        
+                        <!-- ADDED: Missing key section for histogram embed -->
+                        <div class="input-group">
+                            <label for="histogram-embed-key">Key:</label>
+                            <input type="text" id="histogram-embed-key" placeholder="Enter key for encryption" required>
+                            <span class="file-info">Remember this key for extraction</span>
+                        </div>
+                        
+                        <button type="submit" class="submit-btn">Embed Message</button>
+                    </form>
+
+                    <!-- Extract Form -->
+                    <form id="histogram-extract" class="operation-form">
+                        <div class="file-input-group">
+                            <label for="histogram-extract-stego">Stego Image:</label>
+                            <input type="file" id="histogram-extract-stego" accept="image/*" required>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="histogram-extract-key">Key:</label>
+                            <input type="text" id="histogram-extract-key" placeholder="Enter the key used during embedding" required>
+                        </div>
+                        
+                        <button type="submit" class="submit-btn">Extract Message</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Audio Section -->
+        <div id="audioSection" class="content-section">
+            <div class="methods-container">
+                <!-- LSB Audio Method -->
+                <div class="method-card">
+                    <h2 class="method-title">LSB Audio Steganography</h2>
+                    <p class="method-description">Hide files inside audio using LSB method with key-based randomization</p>
+                    
+                    <!-- Operation Toggle -->
+                    <div class="operation-toggle">
+                        <button class="toggle-btn active" data-method="lsb-audio" data-operation="embed">Embed</button>
+                        <button class="toggle-btn" data-method="lsb-audio" data-operation="extract">Extract</button>
+                    </div>
+
+                    <!-- Embed Form -->
+                    <form id="lsb-audio-embed" class="operation-form active">
+                        <div class="file-input-group">
+                            <label for="lsb-audio-embed-cover">Cover Audio:</label>
+                            <input type="file" id="lsb-audio-embed-cover" accept="audio/*" required>
+                            <span class="file-info">Supported formats: WAV Only (Other formats like mp3, flac, m4a will automatically be converted to wav)</span>
+                        </div>
+                        
+                        <div class="file-input-group">
+                            <label for="lsb-audio-embed-secret">Secret File:</label>
+                            <input type="file" id="lsb-audio-embed-secret" required>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="lsb-audio-embed-key">Key:</label>
+                            <input type="text" id="lsb-audio-embed-key" placeholder="Enter key for encryption" required>
+                            <span class="file-info">Remember this key for extraction</span>
+                        </div>
+                        
+                        <button type="submit" class="submit-btn">Embed File</button>
+                    </form>
+
+                    <!-- Extract Form -->
+                    <form id="lsb-audio-extract" class="operation-form">
+                        <div class="file-input-group">
+                            <label for="lsb-audio-extract-stego">Stego Audio:</label>
+                            <input type="file" id="lsb-audio-extract-stego" accept="audio/*" required>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="lsb-audio-extract-key">Key:</label>
+                            <input type="text" id="lsb-audio-extract-key" placeholder="Enter the key used during embedding" required>
+                        </div>
+                        
+                        <button type="submit" class="submit-btn">Extract File</button>
+                    </form>
+                </div>
+
+                <!-- Phase Coding Method -->
+                <div class="method-card">
+                    <h2 class="method-title">Phase Coding</h2>
+                    <p class="method-description">Hide text messages (max 100 chars) using FFT phase manipulation</p>
+                    
+                    <!-- Operation Toggle -->
+                    <div class="operation-toggle">
+                        <button class="toggle-btn active" data-method="phase" data-operation="embed">Embed</button>
+                        <button class="toggle-btn" data-method="phase" data-operation="extract">Extract</button>
+                    </div>
+
+                    <!-- Embed Form -->
+                    <form id="phase-embed" class="operation-form active">
+                    <div class="file-input-group">
+                        <label for="phase-embed-cover">Cover Audio:</label>
+                        <input type="file" id="phase-embed-cover" accept="audio/*" required>
+                        <span class="file-info">Supported formats: WAV</span>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="phase-embed-message">Secret Message:</label>
+                        <textarea id="phase-embed-message" placeholder="Enter your secret message (max 100 characters)" maxlength="100" required></textarea>
+                        <span class="char-counter" id="phase-embed-counter">0/100</span>
+                    </div>
+                    
+                    <!-- ADDED: Missing key section for phase embed -->
+                    <div class="input-group">
+                        <label for="phase-embed-key">Key:</label>
+                        <input type="text" id="phase-embed-key" placeholder="Enter key for encryption" required>
+                        <span class="file-info">Remember this key for extraction</span>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">Embed Message</button>
+                </form>
+
+                    <!-- Extract Form -->
+                    <form id="phase-extract" class="operation-form">
+                    <div class="file-input-group">
+                        <label for="phase-extract-stego">Stego Audio:</label>
+                        <input type="file" id="phase-extract-stego" accept="audio/*" required>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="phase-extract-key">Key:</label>
+                        <input type="text" id="phase-extract-key" placeholder="Enter the key used during embedding" required>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">Extract Message</button>
+                </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="resultsSection" class="results-section">
+            <div class="results-container">
+                <h3>Results</h3>
+                <div class="result-content" id="resultContent">
+                    <!-- Results will be displayed here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div id="loadingOverlay" class="loading-overlay">
+            <div class="loading-spinner"></div>
+            <p>Processing...</p>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>
