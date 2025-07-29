@@ -60,7 +60,7 @@ app = FastAPI(
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["https://steghub.onrender.com","http://localhost:3000","http://127.0.0.1:3000"],
     allow_credentials=False,
     allow_methods=["GET","POST","PUT","DELETE","OPTIONS"],
     allow_headers=["*"],

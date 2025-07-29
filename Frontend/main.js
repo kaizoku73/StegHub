@@ -3,7 +3,7 @@
 class SteghubApp {
     constructor() {
         this.POSSIBLE_API_URLS = [
-            'https://steghub.onrender.com',
+            'https://steghub-backend.onrender.com',
             'http://localhost:8000',
             'http://127.0.0.1:8000',
             'http://0.0.0.0:8000'
