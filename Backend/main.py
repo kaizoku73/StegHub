@@ -64,7 +64,7 @@ app = FastAPI(
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://steghub.onrender.com","http://localhost:3000","http://127.0.0.1:3000","https://localhost:3000"],
+    allow_origins=["https://steghub.onrender.com","https://steghub.onrender.com/"],
     allow_credentials=False,
     allow_methods=["GET","POST","OPTIONS"],
     allow_headers=["*"],
@@ -104,7 +104,6 @@ async def embed_options_handler(endpoint: str):
 @app.options("/extract/{endpoint:path}")
 async def extract_options_handler(endpoint: str):
     return {"message": "OK"}
-
 
 
 # ==================== IMAGE LSB ENDPOINTS ====================
@@ -485,4 +484,4 @@ async def manual_cleanup():
     }
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=False)
