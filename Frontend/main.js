@@ -62,46 +62,46 @@ class SteghubApp {
         return false;
     }
 
-    async makeAPIRequest(endpoint, options = {}) {
-        if (!this.connectionTested || !this.API_BASE_URL) {
-            const connected = await this.establishConnection();
-            if (!connected) {
-                throw new Error('Backend connection not available');
-            }
-        }
-
-        const url = `${this.API_BASE_URL}${endpoint}`;
-        
-        const defaultOptions = {
-            mode: 'cors',
-            credentials: 'omit',
-            headers: {},
-            ...options
-        };
-
-        // Don't set Content-Type for FormData - let browser handle it
-        if (!(options.body instanceof FormData)) {
-            defaultOptions.headers['Content-Type'] = 'application/json';
-        }
-
+    async makeAPIRequest(endpoint, formData) {
+    const errors = [];
+    
+    for (const baseUrl of this.POSSIBLE_API_URLS) {
         try {
-            console.log(`Making ${defaultOptions.method || 'GET'} request to: ${url}`);
-            const response = await fetch(url, defaultOptions);
-            console.log(`Response status: ${response.status}`);
-            return response;
-        } catch (error) {
-            console.error(`Request failed for ${url}:`, error);
+            console.log(`Testing connection to: ${baseUrl}`);
             
-            // If it's a network error, try to reconnect
-            if (error.name === 'TypeError' || error.message.includes('fetch')) {
-                console.log('Network error detected, attempting to reconnect...');
-                this.connectionTested = false;
-                await this.establishConnection();
+            // Test connection first
+            const healthResponse = await fetch(`${baseUrl}/health`, {
+                method: 'GET',
+                mode: 'cors',
+            });
+            
+            if (!healthResponse.ok) {
+                throw new Error(`Health check failed: ${healthResponse.status}`);
             }
             
-            throw error;
+            console.log(`✅ Connected to backend at: ${baseUrl}`);
+            
+            // Make the actual request
+            const response = await fetch(`${baseUrl}${endpoint}`, {
+                method: 'POST',
+                mode: 'cors',
+                body: formData, // Don't set Content-Type header - let browser set it
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            return response;
+            
+        } catch (error) {
+            console.error(`❌ Failed to connect to ${baseUrl}:`, error);
+            errors.push(`${baseUrl}: ${error.message}`);
         }
     }
+    
+    throw new Error(`Failed to connect to any backend URL:\n${errors.join('\n')}`);
+}
 
     setupEventListeners() {
         console.log('Setting up event listeners...');

@@ -1,9 +1,12 @@
 from pathlib import Path
 import uvicorn
 
-from fastapi import FastAPI, UploadFile, File, Form, HTTPException
-from fastapi.responses import FileResponse
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException,Request
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
 
 from imglsb.lsb_embed_img import embed_lsb_img
 from imglsb.lsb_extract_img import extract_lsb_img
@@ -15,6 +18,7 @@ from phase.phase_embed import embed_phase
 from phase.phase_extract import extract_phase
 from utils.capacity_check import *
 from helper import *
+
 
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -60,13 +64,24 @@ app = FastAPI(
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["https://steghub.onrender.com","http://localhost:3000","http://127.0.0.1:3000","https://localhost:3000"],
     allow_credentials=False,
-    allow_methods=["GET","POST","PUT","DELETE","OPTIONS"],
+    allow_methods=["GET","POST","OPTIONS"],
     allow_headers=["*"],
     expose_headers=["*"]
 )
 
+@app.middleware("http")
+async def limit_upload_size(request: Request, call_next):
+    if request.method == "POST":
+        content_length = request.headers.get("content-length")
+        if content_length and int(content_length) > 100 * 1024 * 1024:  # 100MB limit
+            return JSONResponse(
+                status_code=413,
+                content={"detail": "File too large"}
+            )
+    response = await call_next(request)
+    return response
 
 # Temp directory setup
 TEMP_DIR = Path("temp")
