@@ -40,13 +40,12 @@ def embed_phase(audio, payload, key):
     total_bits = len(textInBinary)
 
     blockLength = int(2 * 2 ** np.ceil(np.log2(2 * total_bits)))
-
-    caudio = audio.copy()        
+    
     # checks shape to change data to 1 axis
     if len(audio.shape) == 1:
         samples = len(audio)
         mono = True
-        audio_channel = caudio.copy()
+        audio_channel = audio.copy()
 
     elif len(audio.shape) == 2:     
         samples = audio.shape[0]

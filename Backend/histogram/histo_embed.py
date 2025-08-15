@@ -47,6 +47,8 @@ def hist_embed(cover_path, payload, key):
         
         payload = payload.ljust(100).encode('utf-8')
         epayload = encryption(payload, key)
+        print("Encryption successfull on payload")
+        print("Loading image...")
 
         starting = b'HISTOSTART'
         ending = b'HISTO_END!'
@@ -64,6 +66,7 @@ def hist_embed(cover_path, payload, key):
         height, width, channel = arr.shape
 
         flat = {ch: arr[..., i].flatten() for i , ch in enumerate(('R','G','B'))}
+        print(f"Image dimensions: {width}x{height}")
 
         peaks, zeros, shifts = {},{},{}
         total_capacity = 0
@@ -81,12 +84,17 @@ def hist_embed(cover_path, payload, key):
             else:
                 mask = (flat[ch] < u) & (flat[ch] > z)
                 flat[ch][mask] -= 1
+            print(f"Channel {ch}: Peak={u}, Zero={z}, Capacity={hist[u]} bits")
+
+        print(f"Total embedding capacity: {total_capacity} bits")
 
         if total_capacity < total_bits:
             raise ValueError(f"Insufficient capacity : {total_capacity}")
         
         bits_pr_ch = total_bits // 3
         remainder = total_bits % 3
+
+        print("Embedding bits in each channel...")
 
         bits_distro = {}
         start_idx = 0
@@ -118,6 +126,8 @@ def hist_embed(cover_path, payload, key):
                     if channel_bits[bit_idx] == '1':
                         flat[ch][pos] = u + shift
                     bit_idx += 1
+            print(f"Successfully embedded {len(channel_bits)} bits in channel {ch}")
+
             
         stego = np.stack([flat[ch] for ch in ('R','G','B')], axis = 1)
         stego = stego.reshape((height, width, 3)).astype(np.uint8)

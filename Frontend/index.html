@@ -13,7 +13,7 @@
         <!-- Header Section -->
         <div class="header">
             <h1 class="logo">Steghub</h1>
-            <p class="subtitle">Advanced Steganography Tool for Secure Data Hiding</p>
+            <p class="subtitle">Advanced Steganography Tool </p>
             
             <!-- Mode Toggle Switch -->
             <div class="mode-toggle">
@@ -45,12 +45,15 @@
                         <div class="file-input-group">
                             <label for="lsb-image-embed-cover">Cover Image:</label>
                             <input type="file" id="lsb-image-embed-cover" accept="image/*" required>
-                            <span class="file-info">Supported formats: PNG Only</span>
+                            <span class="file-info">Supported formats: PNG Only </span>
+                            <!-- Upload status will be dynamically inserted here -->
                         </div>
                         
                         <div class="file-input-group">
                             <label for="lsb-image-embed-secret">Secret File:</label>
                             <input type="file" id="lsb-image-embed-secret" required>
+                            <span class="file-info">Any file type • Max 40MB </span>
+                            <!-- Upload status will be dynamically inserted here -->
                         </div>
                         
                         <div class="input-group">
@@ -67,6 +70,8 @@
                         <div class="file-input-group">
                             <label for="lsb-image-extract-stego">Stego Image:</label>
                             <input type="file" id="lsb-image-extract-stego" accept="image/*" required>
+                            <span class="file-info">Image with hidden file </span>
+                            <!-- Upload status will be dynamically inserted here -->
                         </div>
                         
                         <div class="input-group">
@@ -94,7 +99,8 @@
                         <div class="file-input-group">
                             <label for="histogram-embed-cover">Cover Image:</label>
                             <input type="file" id="histogram-embed-cover" accept="image/*" required>
-                            <span class="file-info">Supported formats: PNG Only</span>
+                            <span class="file-info">Supported formats: PNG Only </span>
+                            <!-- Upload status will be dynamically inserted here -->
                         </div>
                         
                         <div class="input-group">
@@ -103,7 +109,6 @@
                             <span class="char-counter" id="histogram-embed-counter">0/100</span>
                         </div>
                         
-                        <!-- ADDED: Missing key section for histogram embed -->
                         <div class="input-group">
                             <label for="histogram-embed-key">Key:</label>
                             <input type="text" id="histogram-embed-key" placeholder="Enter key for encryption" required>
@@ -118,6 +123,8 @@
                         <div class="file-input-group">
                             <label for="histogram-extract-stego">Stego Image:</label>
                             <input type="file" id="histogram-extract-stego" accept="image/*" required>
+                            <span class="file-info">Image with hidden message</span>
+                            <!-- Upload status will be dynamically inserted here -->
                         </div>
                         
                         <div class="input-group">
@@ -150,12 +157,15 @@
                         <div class="file-input-group">
                             <label for="lsb-audio-embed-cover">Cover Audio:</label>
                             <input type="file" id="lsb-audio-embed-cover" accept="audio/*" required>
-                            <span class="file-info">Supported formats: WAV Only (Other formats like mp3, flac, m4a will automatically be converted to wav)</span>
+                            <span class="file-info">Supported: WAV (others auto-converted)</span>
+                            <!-- Upload status will be dynamically inserted here -->
                         </div>
                         
                         <div class="file-input-group">
                             <label for="lsb-audio-embed-secret">Secret File:</label>
                             <input type="file" id="lsb-audio-embed-secret" required>
+                            <span class="file-info">Any file type • Max 40MB </span>
+                            <!-- Upload status will be dynamically inserted here -->
                         </div>
                         
                         <div class="input-group">
@@ -172,6 +182,8 @@
                         <div class="file-input-group">
                             <label for="lsb-audio-extract-stego">Stego Audio:</label>
                             <input type="file" id="lsb-audio-extract-stego" accept="audio/*" required>
+                            <span class="file-info">Audio with hidden file</span>
+                            <!-- Upload status will be dynamically inserted here -->
                         </div>
                         
                         <div class="input-group">
@@ -196,42 +208,44 @@
 
                     <!-- Embed Form -->
                     <form id="phase-embed" class="operation-form active">
-                    <div class="file-input-group">
-                        <label for="phase-embed-cover">Cover Audio:</label>
-                        <input type="file" id="phase-embed-cover" accept="audio/*" required>
-                        <span class="file-info">Supported formats: WAV</span>
-                    </div>
-                    
-                    <div class="input-group">
-                        <label for="phase-embed-message">Secret Message:</label>
-                        <textarea id="phase-embed-message" placeholder="Enter your secret message (max 100 characters)" maxlength="100" required></textarea>
-                        <span class="char-counter" id="phase-embed-counter">0/100</span>
-                    </div>
-                    
-                    <!-- ADDED: Missing key section for phase embed -->
-                    <div class="input-group">
-                        <label for="phase-embed-key">Key:</label>
-                        <input type="text" id="phase-embed-key" placeholder="Enter key for encryption" required>
-                        <span class="file-info">Remember this key for extraction</span>
-                    </div>
-                    
-                    <button type="submit" class="submit-btn">Embed Message</button>
-                </form>
+                        <div class="file-input-group">
+                            <label for="phase-embed-cover">Cover Audio:</label>
+                            <input type="file" id="phase-embed-cover" accept="audio/*" required>
+                            <span class="file-info">Supported formats: WAV</span>
+                            <!-- Upload status will be dynamically inserted here -->
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="phase-embed-message">Secret Message:</label>
+                            <textarea id="phase-embed-message" placeholder="Enter your secret message (max 100 characters)" maxlength="100" required></textarea>
+                            <span class="char-counter" id="phase-embed-counter">0/100</span>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="phase-embed-key">Key:</label>
+                            <input type="text" id="phase-embed-key" placeholder="Enter key for encryption" required>
+                            <span class="file-info">Remember this key for extraction</span>
+                        </div>
+                        
+                        <button type="submit" class="submit-btn">Embed Message</button>
+                    </form>
 
                     <!-- Extract Form -->
                     <form id="phase-extract" class="operation-form">
-                    <div class="file-input-group">
-                        <label for="phase-extract-stego">Stego Audio:</label>
-                        <input type="file" id="phase-extract-stego" accept="audio/*" required>
-                    </div>
-                    
-                    <div class="input-group">
-                        <label for="phase-extract-key">Key:</label>
-                        <input type="text" id="phase-extract-key" placeholder="Enter the key used during embedding" required>
-                    </div>
-                    
-                    <button type="submit" class="submit-btn">Extract Message</button>
-                </form>
+                        <div class="file-input-group">
+                            <label for="phase-extract-stego">Stego Audio:</label>
+                            <input type="file" id="phase-extract-stego" accept="audio/*" required>
+                            <span class="file-info">Audio with hidden message</span>
+                            <!-- Upload status will be dynamically inserted here -->
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="phase-extract-key">Key:</label>
+                            <input type="text" id="phase-extract-key" placeholder="Enter the key used during embedding" required>
+                        </div>
+                        
+                        <button type="submit" class="submit-btn">Extract Message</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -246,10 +260,10 @@
             </div>
         </div>
 
-        <!-- Loading Overlay -->
+        <!-- Enhanced Loading Overlay -->
         <div id="loadingOverlay" class="loading-overlay">
             <div class="loading-spinner"></div>
-            <p>Processing...</p>
+            <p class="loading-text">Processing...</p>
         </div>
     </div>
 

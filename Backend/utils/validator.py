@@ -15,7 +15,7 @@ def detect_file_type(data):
         b'GIF87a': ('gif', 'image/gif'),
         b'GIF89a': ('gif', 'image/gif'),
         b'BM': ('bmp', 'image/bmp'),
-        b'RIFF': ('webp', 'image/webp'),  # Could also be WAV, need further check
+        b'RIFF': ('webp', 'image/webp'),
         b'\x00\x00\x01\x00': ('ico', 'image/x-icon'),
         
         # Documents
@@ -51,7 +51,6 @@ def detect_file_type(data):
         b'<!DOCTYPE html': ('html', 'text/html'),
     }
     
-    # Check for exact matches first
     for sig, (ext, mime) in signatures.items():
         if data.startswith(sig):
             # Special handling for RIFF files
@@ -64,9 +63,8 @@ def detect_file_type(data):
                     return 'avi', 'video/x-msvideo'
             return ext, mime
     
-    # Check for text files (simple heuristic)
+    # Check for text files
     try:
-        # Try to decode as UTF-8 and check if it's mostly printable
         text = data[:min(512, len(data))].decode('utf-8', errors='strict')
         if all(ord(c) < 127 and (c.isprintable() or c.isspace()) for c in text):
             # Further classify text files

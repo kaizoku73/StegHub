@@ -1,8 +1,3 @@
-"""
-File management utilities for steganography API
-Handles temporary file creation, cleanup, and audio conversion
-"""
-
 import uuid
 from pathlib import Path
 import time
@@ -114,7 +109,7 @@ def save_upload_file(upload_file: UploadFile, temp_dir: Path) -> str:
     try:
         with open(file_path, "wb") as buffer:
             upload_file.file.seek(0)
-            while chunk := upload_file.file.read(8192):
+            while chunk := upload_file.file.read(65536):
                 buffer.write(chunk)
     finally:
         # Explicitly close the upload file
@@ -201,8 +196,7 @@ def ensure_wav_format(file_path: str, temp_dir: Path) -> str:
         
         # Close audio object and force cleanup
         del audio
-        force_close_file_handles()
-        
+
         register_temp_file(str(wav_path))
         logging.info("Audio conversion completed successfully.")
         return str(wav_path)
