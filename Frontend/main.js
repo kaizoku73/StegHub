@@ -35,20 +35,14 @@ class SteghubApp {
             try {
                 console.log(`Testing connection to: ${url}`);
                 
-                const response = await fetch(`${url}/health`, {
-                    method: 'GET',
-                    mode: 'cors',
-                    credentials: 'omit',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
+                const response = await fetch(`${url}/`, {
+                    method: 'GET'
                 });
                 
                 if (response.ok) {
-                    const data = await response.json();
                     this.API_BASE_URL = url;
                     this.connectionTested = true;
-                    console.log(`✅ Connected to backend at: ${url}`, data);
+                    console.log(`✅ Connected to backend at: ${url}`);
                     return true;
                 }
             } catch (error) {
@@ -62,45 +56,31 @@ class SteghubApp {
     }
 
     async makeAPIRequest(endpoint, formData) {
-    const errors = [];
-    
-    for (const baseUrl of this.POSSIBLE_API_URLS) {
-        try {
-            console.log(`Testing connection to: ${baseUrl}`);
-            
-            // Test connection first
-            const healthResponse = await fetch(`${baseUrl}/health`, {
-                method: 'GET',
-                mode: 'cors',
-            });
-            
-            if (!healthResponse.ok) {
-                throw new Error(`Health check failed: ${healthResponse.status}`);
+        const errors = [];
+        
+        for (const baseUrl of this.POSSIBLE_API_URLS) {
+            try {
+                console.log(`Making request to: ${baseUrl}${endpoint}`);
+                
+                const response = await fetch(`${baseUrl}${endpoint}`, {
+                    method: 'POST',
+                    body: formData,
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                return response;
+                
+            } catch (error) {
+                console.error(`❌ Request failed to ${baseUrl}:`, error);
+                errors.push(`${baseUrl}: ${error.message}`);
             }
-            
-            console.log(`✅ Connected to backend at: ${baseUrl}`);
-            
-            // Make the actual request
-            const response = await fetch(`${baseUrl}${endpoint}`, {
-                method: 'POST',
-                mode: 'cors',
-                body: formData, // Don't set Content-Type header - let browser set it
-            });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            return response;
-            
-        } catch (error) {
-            console.error(`❌ Failed to connect to ${baseUrl}:`, error);
-            errors.push(`${baseUrl}: ${error.message}`);
         }
+        
+        throw new Error(`Failed to connect to any backend URL:\n${errors.join('\n')}`);
     }
-    
-    throw new Error(`Failed to connect to any backend URL:\n${errors.join('\n')}`);
-}
 
     setupEventListeners() {
         console.log('Setting up event listeners...');
@@ -295,10 +275,7 @@ class SteghubApp {
             formData.append('secret_file', secretFile);
             formData.append('key', key);
             
-            const response = await this.makeAPIRequest('/embed/image/lsb', {
-                method: 'POST',
-                body: formData
-            });
+            const response = await this.makeAPIRequest('/embed/image/lsb', formData);
             
             if (response.ok) {
                 const blob = await response.blob();
@@ -330,10 +307,7 @@ class SteghubApp {
             formData.append('stego_image', stegoImage);
             formData.append('key', key);
             
-            const response = await this.makeAPIRequest('/extract/image/lsb', {
-                method: 'POST',
-                body: formData
-            });
+            const response = await this.makeAPIRequest('/extract/image/lsb', formData);
             
             if (response.ok) {
                 const blob = await response.blob();
@@ -373,10 +347,7 @@ class SteghubApp {
             formData.append('message', message);
             formData.append('key', key);
             
-            const response = await this.makeAPIRequest('/embed/image/histogram', {
-                method: 'POST',
-                body: formData
-            });
+            const response = await this.makeAPIRequest('/embed/image/histogram', formData);
             
             if (response.ok) {
                 const blob = await response.blob();
@@ -408,10 +379,7 @@ class SteghubApp {
             formData.append('stego_image', stegoImage);
             formData.append('key', key);
             
-            const response = await this.makeAPIRequest('/extract/image/histogram', {
-                method: 'POST',
-                body: formData
-            });
+            const response = await this.makeAPIRequest('/extract/image/histogram', formData);
             
             if (response.ok) {
                 const result = await response.json();
@@ -446,10 +414,7 @@ class SteghubApp {
             formData.append('secret_file', secretFile);
             formData.append('key', key);
             
-            const response = await this.makeAPIRequest('/embed/audio/lsb', {
-                method: 'POST',
-                body: formData
-            });
+            const response = await this.makeAPIRequest('/embed/audio/lsb', formData);
             
             if (response.ok) {
                 const blob = await response.blob();
@@ -481,10 +446,7 @@ class SteghubApp {
             formData.append('stego_audio', stegoAudio);
             formData.append('key', key);
             
-            const response = await this.makeAPIRequest('/extract/audio/lsb', {
-                method: 'POST',
-                body: formData
-            });
+            const response = await this.makeAPIRequest('/extract/audio/lsb', formData);
             
             if (response.ok) {
                 const blob = await response.blob();
@@ -524,10 +486,7 @@ class SteghubApp {
             formData.append('message', message);
             formData.append('key', key);
             
-            const response = await this.makeAPIRequest('/embed/audio/phase', {
-                method: 'POST',
-                body: formData
-            });
+            const response = await this.makeAPIRequest('/embed/audio/phase', formData);
             
             if (response.ok) {
                 const blob = await response.blob();
@@ -559,10 +518,7 @@ class SteghubApp {
             formData.append('stego_audio', stegoAudio);
             formData.append('key', key);
             
-            const response = await this.makeAPIRequest('/extract/audio/phase', {
-                method: 'POST',
-                body: formData
-            });
+            const response = await this.makeAPIRequest('/extract/audio/phase', formData);
             
             if (response.ok) {
                 const result = await response.json();
