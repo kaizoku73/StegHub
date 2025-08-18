@@ -6,7 +6,13 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-009639?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com)
 
 
-**Steghub** is a cutting-edge, web-based steganography platform that enables secure data hiding using multiple advanced techniques. Built with a modern FastAPI backend and a sleek cyberpunk-themed frontend, Steghub supports both image and audio steganography with military-grade AES encryption.
+**Steghub** is a steganography platform that enables secure data hiding using multiple advanced techniques. Built with a modern FastAPI backend and a sleek cyberpunk-themed frontend, Steghub supports both image and audio steganography with military-grade AES encryption.
+
+## ⚠️IMPORTANT
+- **This project is only to use in local server as I have created this as my college's major project. Do not try to deploy this project as it was not meant for deployment, I have not added mostly technical specification for deployment. There's a reason as for why there is no platform for steganography on web that anyone(including criminals) would be able to use it and each operation takes usage of about 4-8GB RAM, so it will also be costly for you to host**
+
+## ⚠️Disclaimer
+- **This concept can be applied for both ethical and unethical purposes. The content of this project is for educational purposes only and is not to be used to play pranks, or harm people and infrastructure. Misuse of data hiding techniques for illegal or unethical activities may lead to serious legal consequences.**
 
 ## 🌟 Features
 
@@ -38,7 +44,6 @@
 
 ### Prerequisites
 - Python 3.8+
-- Node.js (for development)
 - Git
 
 ### Installation
@@ -169,11 +174,6 @@ frontend/
 
 ## 🔧 API Endpoints
 
-### Health & Utility
-- `GET /` - Health check with auto-cleanup
-- `GET /health` - System health status
-- `GET /cleanup` - Manual cleanup endpoint
-
 ### Image Steganography
 - `POST /embed/image/lsb` - Embed file in image using LSB
 - `POST /extract/image/lsb` - Extract file from LSB image
@@ -187,12 +187,6 @@ frontend/
 - `POST /extract/audio/phase` - Extract message from phase audio
 
 ## 🎯 Technical Specifications
-
-### File Limits
-- **Cover Images**: 100MB (PNG only)
-- **Cover Audio**: 100MB (WAV primary, auto-conversion supported)
-- **Payload Files**: 40MB maximum
-- **Text Messages**: 100 characters maximum
 
 ### Supported Formats
 
@@ -212,29 +206,10 @@ frontend/
 
 ## 🛠️ Development
 
-### Running Tests
-```bash
-# Backend tests
-cd backend
-python -m pytest tests/
-
-# Frontend testing
-cd frontend
-# Open index.html in browser and test manually
-```
-
 ### Code Style
 - **Backend**: Follow PEP 8 standards
 - **Frontend**: ES6+ JavaScript standards
 - **Documentation**: Comprehensive docstrings and comments
-
-### Contributing
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
 
 ## ⚠️ Security Considerations
 
@@ -264,29 +239,6 @@ cd frontend
 - **CPU**: Intensive during FFT operations (phase coding)
 - **Storage**: Temporary files cleaned automatically
 
-## 🐛 Troubleshooting
-
-### Common Issues
-
-**"Cover file too large" Error:**
-- Reduce file size or upgrade to paid hosting tier
-- Compress images/audio before uploading
-
-**"Insufficient capacity" Error:**
-- Use larger cover files
-- Reduce payload size
-- Check capacity requirements in error message
-
-**"Extraction failed" Error:**
-- Verify the correct key is being used
-- Ensure the file contains embedded data
-- Check file hasn't been modified after embedding
-
-**CORS Errors:**
-- Ensure backend is running on correct port
-- Check CORS settings in main.py
-- Verify frontend is accessing correct API URL
-
 ## 📜 License
 
 This project is open source, feel free to use and modify it. Just don't forget to credit me if you share it!
@@ -298,10 +250,6 @@ This project is open source, feel free to use and modify it. Just don't forget t
 - **NumPy/SciPy**: For numerical computing
 - **Librosa**: For audio analysis
 - **PyCryptodome**: For encryption implementations
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit issues, feature requests, or pull requests.
 
 ---
 
