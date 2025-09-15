@@ -1,3 +1,4 @@
+<pre>
 ╔═══════════════════════════════════════════════════════╗
 ║                                                       ║
 ║  ███████╗████████╗███████╗ ██████╗ ██╗  ██╗██╗   ██╗██████╗  ║
@@ -15,6 +16,7 @@
 ║    └─────────────────────────────────────────────┘    ║
 ║                                                       ║
 ╚═══════════════════════════════════════════════════════╝
+</pre>
 
 # StegHub - Advanced Steganography Toolkit
 
@@ -51,6 +53,7 @@ steghub resono extract --stego audio_with_secret.wav --key mykey
 # Check installed tools
 steghub info
 steghub list
+steghub version
 ```
 
 ## Individual Tools
@@ -87,6 +90,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
+<div align="center">
+
 *"The best place to hide a leaf is in the forest"* 🌲
 
-**Made by kaizoku**
+**Made with ❤️ by kaizoku**
+
+</div>

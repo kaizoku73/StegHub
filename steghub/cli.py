@@ -7,6 +7,12 @@ Main CLI interface that provides access to all tools
 import sys
 import subprocess
 import argparse
+import os
+import json
+import time
+import urllib.request
+import urllib.error
+import re
 
 TOOLS = {
     'gradus': {
@@ -22,6 +28,157 @@ TOOLS = {
         'details': 'Hide any file type in images or audio using Least Significant Bit technique'
     }
 }
+
+# system config for update
+PYPI_NAME = 'steghub'
+CACHE_DIR = os.path.expanduser("~/.steghub")
+CACHE_FILE = os.path.join(CACHE_DIR, "update.json")
+CACHE_TTL = int(os.environ.get('STEGHUB_CACHE_TTL', 7 * 24 * 3600)) # weekly checks for update once
+HTTP_TIMEOUT = 6
+
+def get_installed_version():
+    """Get installed version with better fallbacks"""
+    try:
+        from importlib import metadata
+        return metadata.version(PYPI_NAME)
+    except Exception:
+        # Try getting version from setup.py or __init__.py in same directory
+        try:
+            import steghub
+            if hasattr(steghub, '__version__'):
+                return steghub.__version__
+        except Exception:
+            pass
+        
+        # Last resort: try to parse from pip show
+        try:
+            result = subprocess.run([sys.executable, '-m', 'pip', 'show', PYPI_NAME], 
+                                  capture_output=True, text=True, timeout=5)
+            if result.returncode == 0:
+                for line in result.stdout.splitlines():
+                    if line.startswith('Version: '):
+                        return line.split('Version: ')[1].strip()
+        except Exception:
+            pass
+        
+        return "unknown"
+    
+INSTALLED_VERSION = get_installed_version()
+    
+def parse_version(version_str):
+    """Parse version string into comparable tuple of integers"""
+    if not version_str or version_str == "unknown":
+        return (0, 0, 0)
+    
+    # Remove any non-digit, non-dot characters (like 'v' prefix, alpha/beta suffixes)
+    clean_version = re.sub(r'[^\d.]', '', version_str)
+    
+    try:
+        parts = []
+        for part in clean_version.split('.'):
+            if part.isdigit():
+                parts.append(int(part))
+            else:
+                break  # Stop at first non-numeric part
+        
+        # Pad to at least 3 parts for consistent comparison
+        while len(parts) < 3:
+            parts.append(0)
+            
+        return tuple(parts)
+    except Exception:
+        return (0, 0, 0)
+    
+def compare_versions(version1, version2):
+    """Compare two version strings. Returns 1 if version1 > version2, -1 if version1 < version2, 0 if equal"""
+    v1_tuple = parse_version(version1)
+    v2_tuple = parse_version(version2)
+    
+    if v1_tuple > v2_tuple:
+        return 1
+    elif v1_tuple < v2_tuple:
+        return -1
+    else:
+        return 0
+
+def ensure_cache_dir():
+    os.makedirs(CACHE_DIR, exist_ok=True)
+
+def read_cache():
+    try:
+        with open(CACHE_FILE, "r", encoding='utf-8') as f:
+            return json.load(f)
+    except Exception:
+        return {}
+    
+def write_cache(d):
+    ensure_cache_dir()
+    with open(CACHE_FILE, "w", encoding='utf-8') as f:
+        json.dump(d,f, indent=2)
+
+def get_pypi_latest():
+    url = f'https://pypi.org/pypi/{PYPI_NAME}/json'
+    try:
+        with urllib.request.urlopen(url, timeout=HTTP_TIMEOUT) as r:
+            data = json.load(r)
+            return data.get("info", {}).get("version")
+    except (urllib.error.URLError, ValueError):
+        return None
+        
+def check_update(force=False):
+    cache = read_cache()
+    last = int(cache.get("last_check" , 0))
+    cached_latest = cache.get('latest_version')
+    now = int(time.time())
+
+    if not force and cached_latest and (now - last) < CACHE_TTL:
+        has_update = compare_versions(cached_latest, INSTALLED_VERSION) > 0
+        return has_update, cached_latest, True
+    
+    latest = get_pypi_latest()
+    if latest:
+        cache["last_check"] = now
+        cache['latest_version'] = latest
+        write_cache(cache)
+        has_update = compare_versions(latest, INSTALLED_VERSION) > 0
+        return has_update, latest, False
+    else:
+        if cached_latest:
+            has_update = compare_versions(cached_latest, INSTALLED_VERSION) > 0
+            return has_update, cached_latest, True
+        return False, None, False
+    
+def print_update_notif(latest):
+    print()
+    print(f"New StegHub version available: {latest} (installed: {INSTALLED_VERSION})")
+    print("   Run: steghub update")
+    print("   Or: python -m pip install --upgrade steghub")
+    print()
+
+def manual_update(ask=True):
+    if ask:
+        try:
+            resp = input("Update now via pip? [y/N]: ").strip().lower()
+            if resp != "y":
+                print("Aborted.")
+                return False
+        except KeyboardInterrupt:
+            print("\nUpdate Cancelled.")
+            return False
+        
+    cmd = [sys.executable, "-m", "pip", "install", "--upgrade", PYPI_NAME]
+    try:
+        print("Upgrading StegHub...")
+        subprocess.run(cmd, check=True)
+        print("✓ Upgrade finished! You may need to restart your terminal.")
+        return True
+    except subprocess.CalledProcessError:
+        print("✗ Upgrade failed. Try running:")
+        print("  python -m pip install --upgrade steghub")
+        return False
+    except KeyboardInterrupt:
+        print("\nUpgrade interrupeted")
+        return False
 
 def show_logo():
     """Display StegHub ASCII logo"""
@@ -46,6 +203,24 @@ def show_logo():
 """
     print(logo)
 
+def show_version():
+    """Show version information"""
+    print(f"StegHub version: {INSTALLED_VERSION}")
+    
+    # Check for updates (use cache)
+    try:
+        has_update, latest, used_cache = check_update(force=False)
+        if latest and latest != INSTALLED_VERSION:
+            cache_indicator = " (cached)" if used_cache else " (live)"
+            if has_update:
+                print(f"Latest version: {latest}{cache_indicator} - UPDATE AVAILABLE")
+            else:
+                print(f"Latest version: {latest}{cache_indicator}")
+        elif latest:
+            print("✓ You have the latest version")
+    except Exception:
+        print("Could not check for updates")
+
 def main():
     if len(sys.argv) >= 2 and sys.argv[1] in TOOLS:
         tool = sys.argv[1]
@@ -60,6 +235,9 @@ def main():
             sys.exit(1)
         except subprocess.CalledProcessError as e:
             sys.exit(e.returncode)
+        except KeyboardInterrupt:
+            print(f"\n{tool} interrupted.")
+            sys.exit(130)
     
     # StegHub commands
     parser = argparse.ArgumentParser(
@@ -76,6 +254,9 @@ def main():
     # StegHub specific commands
     subparsers.add_parser('info', help='Show detailed information about each tool')
     subparsers.add_parser('list', help='List all available tools')
+    subparsers.add_parser('version', help='Show version information')
+    subparsers.add_parser('update', help='Update StegHub to latest version')
+    subparsers.add_parser('check-update', help='Check for StegHub updates')
     
     args = parser.parse_args()
     
@@ -87,6 +268,12 @@ def main():
         show_info()
     elif args.command == 'list':
         list_tools()
+    elif args.command == 'version':
+        show_version()
+    elif args.command =='update':
+        manual_update(ask=True)
+    elif args.command == 'check-update':
+        check_update_exp()
     else:
         show_main_help()
 
@@ -105,6 +292,9 @@ def show_main_help():
     print("StegHub commands:")
     print("  info         - Show detailed information about each tool")
     print("  list         - List all available tools")
+    print("  version      - Show version information")
+    print("  update       - Update StegHub to latest version")
+    print("  check-update - Check for StegHub updates")
     print()
     print("Usage examples:")
     print("  gradus --help                       # Show gradus help")
@@ -139,6 +329,24 @@ def list_tools():
     print("Available StegHub tools:")
     for tool in TOOLS.keys():
         print(f"  - {tool}")
+
+def check_update_exp():
+    print("Checking for StegHub updates...")
+    try:
+        has_update, latest, used_cache = check_update(force=True)
+
+        cache_info = " (from cache)" if used_cache else " (live check)"
+        
+        if latest:
+            if has_update:
+                print(f"✓ Update available: {latest} (current: {INSTALLED_VERSION})")
+                print("   Run 'steghub update' to upgrade")
+            else:
+                print(f"✓ You have the latest version: {INSTALLED_VERSION}{cache_info}")
+        else:
+            print("✗ Could not check for updates (network error)")
+    except Exception as e:
+        print(f"✗ Update check failed: {e}")
 
 if __name__ == "__main__":
     main()
