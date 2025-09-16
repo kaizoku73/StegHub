@@ -111,10 +111,13 @@ def read_cache():
     except Exception:
         return {}
     
-def write_cache(d):
+def write_cache(data):
     ensure_cache_dir()
-    with open(CACHE_FILE, "w", encoding='utf-8') as f:
-        json.dump(d,f, indent=2)
+    try:
+        with open(CACHE_FILE, "w", encoding='utf-8') as f:
+            json.dump(data,f, indent=2)
+    except Exception as e:
+        print(f"Warning: Could not write cache: {e}")
 
 def get_pypi_latest():
     url = f'https://pypi.org/pypi/{PYPI_NAME}/json'
@@ -122,7 +125,8 @@ def get_pypi_latest():
         with urllib.request.urlopen(url, timeout=HTTP_TIMEOUT) as r:
             data = json.load(r)
             return data.get("info", {}).get("version")
-    except (urllib.error.URLError, ValueError):
+    except (urllib.error.URLError, ValueError, json.JSONDecodeError) as e:
+        print(f"Warning: Could not fetch latest version: {e}")
         return None
         
 def check_update(force=False):
@@ -148,7 +152,7 @@ def check_update(force=False):
             return has_update, cached_latest, True
         return False, None, False
     
-def print_update_notif(latest):
+def print_update_notification(latest):
     print()
     print(f"New StegHub version available: {latest} (installed: {INSTALLED_VERSION})")
     print("   Run: steghub update")
@@ -177,7 +181,7 @@ def manual_update(ask=True):
         print("  python -m pip install --upgrade steghub")
         return False
     except KeyboardInterrupt:
-        print("\nUpgrade interrupeted")
+        print("\nUpgrade interrupted")
         return False
 
 def show_logo():
@@ -264,18 +268,22 @@ def main():
         show_main_help()
         return
     
-    if args.command == 'info':
-        show_info()
-    elif args.command == 'list':
-        list_tools()
-    elif args.command == 'version':
-        show_version()
-    elif args.command =='update':
-        manual_update(ask=True)
-    elif args.command == 'check-update':
-        check_update_exp()
-    else:
-        show_main_help()
+    try:
+        if args.command == 'info':
+            show_info()
+        elif args.command == 'list':
+            list_tools()
+        elif args.command == 'version':
+            show_version()
+        elif args.command =='update':
+            manual_update(ask=True)
+        elif args.command == 'check-update':
+            check_update_command()
+        else:
+            show_main_help()
+    except KeyboardInterrupt:
+        print("\nOperation cancelled")
+        sys.exit(130)
 
 def show_main_help():
     """Show main StegHub help"""
@@ -311,7 +319,7 @@ def show_info():
     for tool, info in TOOLS.items():
         # Check if tool is installed
         try:
-            subprocess.run([tool, '--help'], capture_output=True, timeout=3)
+            subprocess.run([tool, '--help'], capture_output=True, timeout=5)
             status = "✓ Installed"
         except FileNotFoundError:
             status = "✗ Not installed (pip install {})".format(tool)
@@ -330,7 +338,7 @@ def list_tools():
     for tool in TOOLS.keys():
         print(f"  - {tool}")
 
-def check_update_exp():
+def check_update_command():
     print("Checking for StegHub updates...")
     try:
         has_update, latest, used_cache = check_update(force=True)
