@@ -50,10 +50,12 @@ steghub --help
 steghub gradus embed --in "secret" --cover image.png --key mykey
 steghub resono extract --stego audio_with_secret.wav --key mykey
 
-# Check installed tools
+# Check installed and update tools
 steghub info
 steghub list
 steghub version
+steghub check-update
+steghub update
 ```
 
 ## Individual Tools
