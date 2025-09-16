@@ -37,20 +37,12 @@ CACHE_TTL = int(os.environ.get('STEGHUB_CACHE_TTL', 7 * 24 * 3600)) # weekly che
 HTTP_TIMEOUT = 6
 
 def get_installed_version():
-    """Get installed version with better fallbacks"""
+    """Get installed version from package metadata"""
     try:
         from importlib import metadata
         return metadata.version(PYPI_NAME)
     except Exception:
-        # Try getting version from setup.py or __init__.py in same directory
-        try:
-            import steghub
-            if hasattr(steghub, '__version__'):
-                return steghub.__version__
-        except Exception:
-            pass
-        
-        # Last resort: try to parse from pip show
+        # Fallback: try pip show
         try:
             result = subprocess.run([sys.executable, '-m', 'pip', 'show', PYPI_NAME], 
                                   capture_output=True, text=True, timeout=5)
@@ -81,7 +73,6 @@ def parse_version(version_str):
             else:
                 break  # Stop at first non-numeric part
         
-        # Pad to at least 3 parts for consistent comparison
         while len(parts) < 3:
             parts.append(0)
             
